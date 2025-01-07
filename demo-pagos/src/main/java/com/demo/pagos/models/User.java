@@ -1,5 +1,7 @@
 package com.demo.pagos.models;
 
+import com.demo.pagos.dto.DtoUser;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,10 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Table(name = "users")
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -20,10 +26,8 @@ public class User {
     private Long id;
 
     @Column
-    private String name;
+    private String username;
 
-    @Column
-    private String email;
 
     @Column
     private String password;
@@ -31,5 +35,10 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    public User(DtoUser.Post userDto, Role role) {
+        this.username = userDto.getName();
+        this.role = role;
+    }
 
 }

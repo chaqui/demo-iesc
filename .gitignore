@@ -1,3 +1,5 @@
 .env
 /demo-pagos/target/
 /demo-pagos/target/classes/**
+demo-pagos/target/classes/application.properties
+demo-pagos/target/classes/com/demo/pagos/App.class

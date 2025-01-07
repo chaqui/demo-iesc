@@ -15,6 +15,7 @@ EXCEPTION
 END;
 /
 
+
 -- Crear esquema (usuario local en el PDB)
 BEGIN
     EXECUTE IMMEDIATE 'CREATE USER c##demo IDENTIFIED BY demo_password DEFAULT TABLESPACE USERS';
@@ -190,12 +191,26 @@ EXCEPTION
 END;
 /
 
+-- eliminar tabla pays
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE c##demo.pays';
+    DBMS_OUTPUT.PUT_LINE('Tabla pays eliminada.');
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Tabla pays no existe.');
+        END IF;
+END;
+/
 -- Crear tabla pays
 BEGIN
     EXECUTE IMMEDIATE '
     CREATE TABLE c##demo.pays (
         id NUMBER PRIMARY KEY,
         client_id NUMBER NOT NULL,
+        status NUMBER(1) NOT NULL,
         amount NUMBER(10, 2) NOT NULL,
         pay_date DATE NOT NULL,
         FOREIGN KEY (client_id) REFERENCES c##demo.clients(id)
@@ -234,6 +249,8 @@ END;
 
 -- Insertar datos iniciales
 BEGIN
+    EXECUTE IMMEDIATE 'INSERT INTO c##demo.type_inspections (id, name, cost) VALUES (2, ''INSPECTION 2'', 200.00)';
+    EXECUTE IMMEDIATE 'INSERT INTO c##demo.type_inspections (id, name, cost) VALUES (3, ''INSPECTION 2'', 300.00)';
     EXECUTE IMMEDIATE 'INSERT INTO c##demo.roles (id, name) VALUES (1, ''USER'')';
     EXECUTE IMMEDIATE 'INSERT INTO c##demo.roles (id, name) VALUES (2, ''SYSTEM'')';
     EXECUTE IMMEDIATE 'INSERT INTO c##demo.type_inspections (id, name, cost) VALUES (1, ''INSPECTION 1'', 100.00)';

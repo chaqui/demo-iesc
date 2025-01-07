@@ -71,5 +71,19 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new HttpException("Usuario no encontrado", HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Get user by username
+     * @param username Username
+     * @return User
+     * @throws HttpException if user not found
+     */
+    public User findByUsername(String username) throws HttpException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new HttpException("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
+        return user;
+    }
+
 
 }

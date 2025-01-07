@@ -40,5 +40,12 @@ public class Inspection {
     @JoinColumn(name = "client_id")
     private Client client;
 
+    public Inspection( TypeInspection typeInspection, User user, Client client) {
+        this.date = new Date();
+        this.typeInspection = typeInspection;
+        this.user = user;
+        this.client = client;
+    }
+
 
 }

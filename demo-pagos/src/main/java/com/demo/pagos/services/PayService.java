@@ -13,7 +13,10 @@ import com.demo.pagos.models.Client;
 import com.demo.pagos.models.Pay;
 import com.demo.pagos.repository.PayRepository;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class PayService {
 
     @Autowired
@@ -69,8 +72,13 @@ public class PayService {
 
     public void sendPays() {
         payRepository.findByStatus(State.PAID.getId()).forEach(pay -> {
+            log.info("Sending pay: " + pay.getId());
             this.messagingTemplate.convertAndSend("/topic/pays", new DtoPay.Get(pay));
         });
+    }
+
+    public List<Pay> getByStatus(Long status) {
+        return payRepository.findByStatus(status);
     }
 
 }

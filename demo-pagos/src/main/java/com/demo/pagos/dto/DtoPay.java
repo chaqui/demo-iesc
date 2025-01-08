@@ -1,5 +1,6 @@
 package com.demo.pagos.dto;
 
+import com.demo.pagos.constants.State;
 import com.demo.pagos.models.Pay;
 
 import lombok.Getter;
@@ -20,11 +21,13 @@ public class DtoPay {
         private Long id;
         private Long clientId;
         private Long amount;
+        private String state;
 
         public Get(Pay pay) {
             this.id = pay.getId();
             this.clientId = pay.getClient().getId();
             this.amount = pay.getAmount();
+            this.state = State.getById(pay.getStatus()).name();
         }
     }
 

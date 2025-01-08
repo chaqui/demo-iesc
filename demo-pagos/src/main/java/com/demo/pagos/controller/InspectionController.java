@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,8 +34,10 @@ public class InspectionController {
     }
 
     @PostMapping
-    public ResponseEntity<DtoInspection.Get> createInspection(@RequestBody DtoInspection.Post inspection,
-            @RequestHeader("username") String username) throws HttpException {
+    public ResponseEntity<DtoInspection.Get> createInspection(@RequestBody DtoInspection.Post inspection)
+            throws HttpException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
         return new ResponseEntity<DtoInspection.Get>(
                 new DtoInspection.Get(this.inspectionService.createInspection(inspection, username)),
                 HttpStatus.CREATED);

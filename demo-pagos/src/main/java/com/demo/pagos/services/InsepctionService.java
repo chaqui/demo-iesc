@@ -13,7 +13,10 @@ import com.demo.pagos.models.TypeInspection;
 import com.demo.pagos.models.User;
 import com.demo.pagos.repository.InspectionRepository;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class InsepctionService {
 
     @Autowired
@@ -34,6 +37,7 @@ public class InsepctionService {
         TypeInspection typeInspection = typeInspectionService.getById(inspection.getTypeInspectionId());
 
         Inspection newInspection = new Inspection(typeInspection, user, client);
+        log.info(newInspection.toString());
         return inspectionRepository.save(newInspection);
 
     }

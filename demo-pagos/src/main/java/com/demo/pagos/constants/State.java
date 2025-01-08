@@ -16,4 +16,13 @@ public enum State {
     public Long getId() {
         return id;
     }
+
+    public static State getById(Long id) {
+        for (State state : State.values()) {
+            if (state.getId().equals(id)) {
+                return state;
+            }
+        }
+        return null;
+    }
 }

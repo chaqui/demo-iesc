@@ -22,8 +22,10 @@ public class PayService {
     @Autowired
     private ClientService clientService;
 
+
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
 
     public Pay savePay(DtoPay.Post pay) throws HttpException {
         Client client = clientService.getById(pay.getClientId());
@@ -67,7 +69,7 @@ public class PayService {
 
     public void sendPays() {
         payRepository.findByStatus(State.PAID.getId()).forEach(pay -> {
-            this.messagingTemplate.convertAndSend("/topic/pay", new DtoPay.Get(pay));
+            this.messagingTemplate.convertAndSend("/topic/pays", new DtoPay.Get(pay));
         });
     }
 

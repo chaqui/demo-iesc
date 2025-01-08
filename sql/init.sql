@@ -1,19 +1,7 @@
 -- Habilitar la salida de DBMS_OUTPUT
 SET SERVEROUTPUT ON;
 
--- Eliminar el usuario c##demo si existe
-BEGIN
-    EXECUTE IMMEDIATE 'DROP USER c##demo CASCADE';
-    DBMS_OUTPUT.PUT_LINE('Usuario c##demo eliminado.');
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -1918 THEN
-            RAISE;
-        ELSE
-            DBMS_OUTPUT.PUT_LINE('Usuario c##demo no existe.');
-        END IF;
-END;
-/
+
 
 
 -- Crear esquema (usuario local en el PDB)
@@ -84,6 +72,32 @@ EXCEPTION
             RAISE;
         ELSE
             DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_client ya existe.');
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE c##demo.sequence_id_inspection START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
+    DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_inspection creada.');
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -955 THEN
+            RAISE;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_inspection ya existe.');
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE c##demo.sequence_id_pay START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
+    DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_pay creada.');
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -955 THEN
+            RAISE;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_pay ya existe.');
         END IF;
 END;
 /

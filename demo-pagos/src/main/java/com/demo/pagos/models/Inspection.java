@@ -12,10 +12,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "inspections")
+@NoArgsConstructor
 public class Inspection {
 
     @Id
@@ -37,6 +39,13 @@ public class Inspection {
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
+
+    public Inspection( TypeInspection typeInspection, User user, Client client) {
+        this.date = new Date();
+        this.typeInspection = typeInspection;
+        this.user = user;
+        this.client = client;
+    }
 
 
 }

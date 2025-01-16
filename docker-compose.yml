@@ -3,6 +3,8 @@ services:
     build:
       context: ./demo-pagos/
       dockerfile: Dockerfile
+    volumes:
+      - maven-repo:/root/.m2
     container_name: app-container
     ports:
       - "8080:8080"
@@ -34,3 +36,4 @@ services:
 
 volumes:
   oracle-data:
+  maven-repo:

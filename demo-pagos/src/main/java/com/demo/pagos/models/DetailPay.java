@@ -9,10 +9,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "detail_pays")
+@NoArgsConstructor
 public class DetailPay {
 
     @Id
@@ -20,7 +22,6 @@ public class DetailPay {
     @SequenceGenerator(name = "sequence_id_detail_pay", sequenceName = "sequence_id_detail_pay", allocationSize = 1)
     private Long id;
 
-    private Long amount;
 
     @ManyToOne
     @JoinColumn(name = "pay_id")
@@ -29,5 +30,10 @@ public class DetailPay {
     @ManyToOne
     @JoinColumn(name = "inspection_id")
     private Inspection inspection;
+
+    public DetailPay(Pay pay, Inspection inspection) {
+        this.pay = pay;
+        this.inspection = inspection;
+    }
 
 }

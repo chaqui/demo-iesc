@@ -1,0 +1,14 @@
+<nav *ngIf="showMenu" class="bg-gray-800 p-4">
+  <div class="container mx-auto">
+    <div class="flex justify-between items-center">
+      <div class="text-white text-lg font-bold">Demo Pagos</div>
+      <div>
+        <a [routerLink]="['/']" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+        <a [routerLink]="['/clients']" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Clientes</a>
+        <a [routerLink]="['/inspections']" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Inspecciones</a>
+        <a [routerLink]="['/payments']" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Pagos</a>
+      </div>
+    </div>
+  </div>
+</nav>
+<router-outlet />

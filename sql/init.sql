@@ -1,9 +1,57 @@
 -- Habilitar la salida de DBMS_OUTPUT
 SET SERVEROUTPUT ON;
 
+
+
+
+-- Crear esquema (usuario local en el PDB)
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE USER c##demo IDENTIFIED BY demo_password DEFAULT TABLESPACE USERS';
+    DBMS_OUTPUT.PUT_LINE('Esquema c##demo creado.');
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -1920 THEN
+            RAISE;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Esquema c##demo ya existe.');
+        END IF;
+END;
+/
+
+-- Otorgar privilegios al esquema
+BEGIN
+    EXECUTE IMMEDIATE 'GRANT CONNECT, RESOURCE TO c##demo';
+    EXECUTE IMMEDIATE 'ALTER USER c##demo QUOTA UNLIMITED ON USERS';
+    DBMS_OUTPUT.PUT_LINE('Privilegios otorgados al esquema c##demo.');
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -1920 THEN
+            RAISE;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Privilegios ya otorgados al esquema c##demo.');
+        END IF;
+END;
+/
+
+-- Otorgar privilegios de INSERT al usuario c##demo
+BEGIN
+    EXECUTE IMMEDIATE 'GRANT INSERT ON c##demo.roles TO c##demo';
+    EXECUTE IMMEDIATE 'GRANT INSERT ON c##demo.users TO c##demo';
+    EXECUTE IMMEDIATE 'GRANT INSERT ON c##demo.clients TO c##demo';
+    EXECUTE IMMEDIATE 'GRANT INSERT ON c##demo.type_inspections TO c##demo';
+    EXECUTE IMMEDIATE 'GRANT INSERT ON c##demo.inspections TO c##demo';
+    EXECUTE IMMEDIATE 'GRANT INSERT ON c##demo.pays TO c##demo';
+    EXECUTE IMMEDIATE 'GRANT INSERT ON c##demo.detail_pays TO c##demo';
+    DBMS_OUTPUT.PUT_LINE('Privilegios de INSERT otorgados al usuario c##demo.');
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+END;
+/
+
 -- Crear secuencias
 BEGIN
-    EXECUTE IMMEDIATE 'CREATE SEQUENCE sequence_id_user START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE c##demo.sequence_id_user START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
     DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_user creada.');
 EXCEPTION
     WHEN OTHERS THEN
@@ -16,7 +64,7 @@ END;
 /
 
 BEGIN
-    EXECUTE IMMEDIATE 'CREATE SEQUENCE sequence_id_client START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE c##demo.sequence_id_client START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
     DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_client creada.');
 EXCEPTION
     WHEN OTHERS THEN
@@ -29,7 +77,7 @@ END;
 /
 
 BEGIN
-    EXECUTE IMMEDIATE 'CREATE SEQUENCE sequence_id_inspection START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE c##demo.sequence_id_inspection START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
     DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_inspection creada.');
 EXCEPTION
     WHEN OTHERS THEN
@@ -42,7 +90,7 @@ END;
 /
 
 BEGIN
-    EXECUTE IMMEDIATE 'CREATE SEQUENCE sequence_id_pay START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE c##demo.sequence_id_pay START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
     DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_pay creada.');
 EXCEPTION
     WHEN OTHERS THEN
@@ -54,23 +102,10 @@ EXCEPTION
 END;
 /
 
-BEGIN
-    EXECUTE IMMEDIATE 'CREATE SEQUENCE sequence_id_detail_pay START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE';
-    DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_detail_pay creada.');
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -955 THEN
-            RAISE;
-        ELSE
-            DBMS_OUTPUT.PUT_LINE('Secuencia sequence_id_detail_pay ya existe.');
-        END IF;
-END;
-/
-
--- Crear tablas
+-- Crear tabla roles
 BEGIN
     EXECUTE IMMEDIATE '
-    CREATE TABLE roles (
+    CREATE TABLE c##demo.roles (
         id NUMBER PRIMARY KEY,
         name VARCHAR2(50) NOT NULL
     )';
@@ -85,14 +120,15 @@ EXCEPTION
 END;
 /
 
+-- Crear tabla users
 BEGIN
     EXECUTE IMMEDIATE '
-    CREATE TABLE users (
+    CREATE TABLE c##demo.users (
         id NUMBER PRIMARY KEY,
         username VARCHAR2(50) NOT NULL,
         password VARCHAR2(50) NOT NULL,
         role_id NUMBER NOT NULL,
-        FOREIGN KEY (role_id) REFERENCES roles(id)
+        FOREIGN KEY (role_id) REFERENCES c##demo.roles(id)
     )';
     DBMS_OUTPUT.PUT_LINE('Tabla users creada.');
 EXCEPTION
@@ -105,9 +141,10 @@ EXCEPTION
 END;
 /
 
+-- Crear tabla clients
 BEGIN
     EXECUTE IMMEDIATE '
-    CREATE TABLE clients (
+    CREATE TABLE c##demo.clients (
         id NUMBER PRIMARY KEY,
         name VARCHAR2(50) NOT NULL,
         email VARCHAR2(50) NOT NULL,
@@ -125,9 +162,10 @@ EXCEPTION
 END;
 /
 
+-- Crear tabla type_inspections
 BEGIN
     EXECUTE IMMEDIATE '
-    CREATE TABLE type_inspections (
+    CREATE TABLE c##demo.type_inspections (
         id NUMBER PRIMARY KEY,
         name VARCHAR2(50) NOT NULL,
         cost NUMBER(10, 2) NOT NULL
@@ -143,17 +181,18 @@ EXCEPTION
 END;
 /
 
+-- Crear tabla inspections
 BEGIN
     EXECUTE IMMEDIATE '
-    CREATE TABLE inspections (
+    CREATE TABLE c##demo.inspections (
         id NUMBER PRIMARY KEY,
         client_id NUMBER NOT NULL,
         user_id NUMBER NOT NULL,
         type_inspection_id NUMBER NOT NULL,
         inspection_date DATE NOT NULL,
-        FOREIGN KEY (client_id) REFERENCES clients(id),
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (type_inspection_id) REFERENCES type_inspections(id)
+        FOREIGN KEY (client_id) REFERENCES c##demo.clients(id),
+        FOREIGN KEY (user_id) REFERENCES c##demo.users(id),
+        FOREIGN KEY (type_inspection_id) REFERENCES c##demo.type_inspections(id)
     )';
     DBMS_OUTPUT.PUT_LINE('Tabla inspections creada.');
 EXCEPTION
@@ -166,14 +205,29 @@ EXCEPTION
 END;
 /
 
+-- eliminar tabla pays
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE c##demo.pays';
+    DBMS_OUTPUT.PUT_LINE('Tabla pays eliminada.');
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Tabla pays no existe.');
+        END IF;
+END;
+/
+-- Crear tabla pays
 BEGIN
     EXECUTE IMMEDIATE '
-    CREATE TABLE pays (
+    CREATE TABLE c##demo.pays (
         id NUMBER PRIMARY KEY,
         client_id NUMBER NOT NULL,
+        status NUMBER(1) NOT NULL,
         amount NUMBER(10, 2) NOT NULL,
         pay_date DATE NOT NULL,
-        FOREIGN KEY (client_id) REFERENCES clients(id)
+        FOREIGN KEY (client_id) REFERENCES c##demo.clients(id)
     )';
     DBMS_OUTPUT.PUT_LINE('Tabla pays creada.');
 EXCEPTION
@@ -186,14 +240,15 @@ EXCEPTION
 END;
 /
 
+-- Crear tabla detail_pays
 BEGIN
     EXECUTE IMMEDIATE '
-    CREATE TABLE detail_pays (
+    CREATE TABLE c##demo.detail_pays (
         id NUMBER PRIMARY KEY,
         pay_id NUMBER NOT NULL,
         inspection_id NUMBER NOT NULL,
-        FOREIGN KEY (inspection_id) REFERENCES inspections(id),
-        FOREIGN KEY (pay_id) REFERENCES pays(id)
+        FOREIGN KEY (inspection_id) REFERENCES c##demo.inspections(id),
+        FOREIGN KEY (pay_id) REFERENCES c##demo.pays(id)
     )';
     DBMS_OUTPUT.PUT_LINE('Tabla detail_pays creada.');
 EXCEPTION
@@ -208,9 +263,11 @@ END;
 
 -- Insertar datos iniciales
 BEGIN
-    EXECUTE IMMEDIATE 'INSERT INTO roles (id, name) VALUES (1, ''USER'')';
-    EXECUTE IMMEDIATE 'INSERT INTO roles (id, name) VALUES (2, ''SYSTEM'')';
-    EXECUTE IMMEDIATE 'INSERT INTO type_inspections (id, name, cost) VALUES (1, ''INSPECTION 1'', 100.00)';
+    EXECUTE IMMEDIATE 'INSERT INTO c##demo.type_inspections (id, name, cost) VALUES (2, ''INSPECTION 2'', 200.00)';
+    EXECUTE IMMEDIATE 'INSERT INTO c##demo.type_inspections (id, name, cost) VALUES (3, ''INSPECTION 2'', 300.00)';
+    EXECUTE IMMEDIATE 'INSERT INTO c##demo.roles (id, name) VALUES (1, ''USER'')';
+    EXECUTE IMMEDIATE 'INSERT INTO c##demo.roles (id, name) VALUES (2, ''SYSTEM'')';
+    EXECUTE IMMEDIATE 'INSERT INTO c##demo.type_inspections (id, name, cost) VALUES (1, ''INSPECTION 1'', 100.00)';
     DBMS_OUTPUT.PUT_LINE('Datos iniciales insertados.');
 EXCEPTION
     WHEN OTHERS THEN
